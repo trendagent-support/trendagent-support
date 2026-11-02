@@ -7,7 +7,6 @@
   <title>Поддержка TrendAgent</title>
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       padding: 24px 16px;
@@ -15,7 +14,6 @@
       background: #f5f6f8;
       color: #222;
     }
-
     .container {
       max-width: 480px;
       margin: 40px auto;
@@ -23,14 +21,8 @@
       background: white;
       border-radius: 18px;
     }
-
     h2 { margin-top: 0; }
-
-    p {
-      color: #687080;
-      line-height: 1.5;
-    }
-
+    p { color: #687080; line-height: 1.5; }
     textarea {
       width: 100%;
       min-height: 160px;
@@ -40,7 +32,6 @@
       font-size: 16px;
       resize: vertical;
     }
-
     button {
       width: 100%;
       margin-top: 18px;
@@ -53,47 +44,28 @@
       font-weight: bold;
       cursor: pointer;
     }
-
-    button:disabled {
-      opacity: .5;
-      cursor: not-allowed;
-    }
-
-    #status {
-      margin-top: 16px;
-      line-height: 1.5;
-    }
+    button:disabled { opacity: .5; }
+    #status { margin-top: 16px; line-height: 1.5; }
   </style>
 </head>
 <body>
-
   <div class="container">
     <h2>Обратиться в поддержку</h2>
-
-    <p>
-      Опишите ваш вопрос, и наша команда
-      поможет вам разобраться.
-    </p>
+    <p>Опишите ваш вопрос, и наша команда поможет вам разобраться.</p>
 
     <form id="questionForm">
-      <textarea
-        id="question"
+      <textarea id="question"
         placeholder="Напишите ваш вопрос..."
-        required
-        minlength="3"
-      ></textarea>
-
-      <button type="submit" id="submitButton">
-        Отправить вопрос
-      </button>
+        required minlength="3" maxlength="4000"></textarea>
+      <button type="submit" id="submitButton">Отправить вопрос</button>
     </form>
 
     <div id="status"></div>
   </div>
 
+  <script src="https://st.max.ru/js/max-web-app.js"></script>
   <script>
-    // Адрес сервера добавим после его настройки
-    const API_URL = "";
+    const API_URL = "https://trendagent-support-api.sokolova-alyona-trend.workers.dev/";
 
     const form = document.getElementById("questionForm");
     const button = document.getElementById("submitButton");
@@ -104,11 +76,12 @@
 
       const question = document.getElementById("question").value.trim();
 
-      if (!question) return;
+      if (question.length < 3) return;
 
-      if (!API_URL) {
-        status.textContent =
-          "Приложение создано. Подключаем отправку сообщений.";
+      const appData = window.WebApp?.initData;
+
+      if (!appData) {
+        status.textContent = "Откройте приложение через MAX, чтобы отправить вопрос.";
         return;
       }
 
@@ -119,22 +92,25 @@
         const response = await fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question })
+          body: JSON.stringify({
+            question: question,
+            initData: appData
+          })
         });
 
-        if (!response.ok) throw new Error("Ошибка отправки");
+        if (!response.ok) {
+          throw new Error("Ошибка отправки");
+        }
 
         status.textContent = "Ваш вопрос успешно отправлен!";
         form.reset();
 
       } catch (error) {
-        status.textContent =
-          "Не удалось отправить вопрос. Попробуйте ещё раз.";
+        status.textContent = "Не удалось отправить вопрос. Попробуйте ещё раз.";
       } finally {
         button.disabled = false;
       }
     });
   </script>
-
 </body>
 </html>
