@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Поддержка TrendAgent</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px 16px;
+      font-family: Arial, sans-serif;
+      background: #f5f6f8;
+      color: #222;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 40px auto;
+      padding: 24px;
+      background: white;
+      border-radius: 18px;
+    }
+
+    h2 { margin-top: 0; }
+
+    p {
+      color: #687080;
+      line-height: 1.5;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      padding: 14px;
+      border: 1px solid #dce0e5;
+      border-radius: 12px;
+      font-size: 16px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 16px;
+      border: 0;
+      border-radius: 12px;
+      background: #1685f8;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    #status {
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Обратиться в поддержку</h2>
+
+    <p>
+      Опишите ваш вопрос, и наша команда
+      поможет вам разобраться.
+    </p>
+
+    <form id="questionForm">
+      <textarea
+        id="question"
+        placeholder="Напишите ваш вопрос..."
+        required
+        minlength="3"
+      ></textarea>
+
+      <button type="submit" id="submitButton">
+        Отправить вопрос
+      </button>
+    </form>
+
+    <div id="status"></div>
+  </div>
+
+  <script>
+    // Адрес сервера добавим после его настройки
+    const API_URL = "";
+
+    const form = document.getElementById("questionForm");
+    const button = document.getElementById("submitButton");
+    const status = document.getElementById("status");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const question = document.getElementById("question").value.trim();
+
+      if (!question) return;
+
+      if (!API_URL) {
+        status.textContent =
+          "Приложение создано. Подключаем отправку сообщений.";
+        return;
+      }
+
+      button.disabled = true;
+      status.textContent = "Отправляем вопрос...";
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question })
+        });
+
+        if (!response.ok) throw new Error("Ошибка отправки");
+
+        status.textContent = "Ваш вопрос успешно отправлен!";
+        form.reset();
+
+      } catch (error) {
+        status.textContent =
+          "Не удалось отправить вопрос. Попробуйте ещё раз.";
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>
