@@ -79,6 +79,7 @@
       if (question.length < 3) return;
 
       const rawInitData = window.WebApp?.initData;
+      console.log("MAX initData:", Boolean(rawInitData), "length:", rawInitData?.length);
 
 let appData = rawInitData;
 
