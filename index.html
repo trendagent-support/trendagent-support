@@ -78,7 +78,14 @@
 
       if (question.length < 3) return;
 
-      const appData = window.WebApp?.initData;
+      const rawInitData = window.WebApp?.initData;
+
+let appData = rawInitData;
+
+if (rawInitData) {
+  const params = new URLSearchParams(rawInitData);
+  appData = params.get("WebAppData") || rawInitData;
+}
 
       if (!appData) {
         status.textContent = "Откройте приложение через MAX, чтобы отправить вопрос.";
